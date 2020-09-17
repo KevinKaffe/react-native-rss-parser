@@ -1,13 +1,15 @@
 # react-native-rss-parser
+
 > React Native compatible RSS parser
 
 [![npm version](https://badge.fury.io/js/react-native-rss-parser.svg)](https://badge.fury.io/js/react-native-rss-parser)
 [![Build Status](https://api.travis-ci.org/jameslawler/react-native-rss-parser.png?branch=master)](https://travis-ci.org/jameslawler/react-native-rss-parser)
 
 Parse RSS data into a simple object structure. Currently supports;
-* RSS 2.0 specification
-* Atom 1.0 specification
-* Itunes elements for both RSS 2.0 and Atom 1.0 feeds
+
+- RSS 2.0 specification
+- Atom 1.0 specification
+- Itunes elements for both RSS 2.0 and Atom 1.0 feeds
 
 ## Installation
 
@@ -18,12 +20,12 @@ npm install react-native-rss-parser --save
 ## Usage example
 
 ```js
-import * as rssParser from 'react-native-rss-parser';
+import * as rssParser from "react-native-rss-parser";
 
-return fetch('http://www.nasa.gov/rss/dyn/breaking_news.rss')
-  .then((response) => response.text())
-  .then((responseData) => rssParser.parse(responseData))
-  .then((rss) => {
+return fetch("http://www.nasa.gov/rss/dyn/breaking_news.rss")
+  .then(response => response.text())
+  .then(responseData => rssParser.parse(responseData))
+  .then(rss => {
     console.log(rss.title);
     console.log(rss.items.length);
   });
@@ -118,38 +120,54 @@ return fetch('http://www.nasa.gov/rss/dyn/breaking_news.rss')
 }
 ```
 
+### Custom fields
+
+Custom fields can be passed into the parse function. For example:
+
+```js
+import * as rssParser from "react-native-rss-parser";
+
+return fetch("http://www.nasa.gov/rss/dyn/breaking_news.rss")
+  .then(response => response.text())
+  .then(responseData => rssParser.parse(responseData, ["customField"]))
+  .then(rss => {
+    console.log(rss.title);
+    console.log(rss.items.length);
+  });
+```
+
 ## Model mappings
 
 ### Top Level elements
 
-| Parsed Value  | RSS v2.0      | Atom v1.0     |
-| ------------- | ------------- | ------------- |
-| title         | title         | title         |
-| links         | link          | link          |
-| description   | description   | subtitle      |
-| language      | language      |               |
-| copyright     | copyright     | rights        |
-| authors       | managingEditor| author        |
-| published     | pubDate       | published     |
-| updated       | lastBuildDate | updated       |
-| categories    | category      | category      |
-| image         | image         | logo          |
-| items         | item          | entry         |
+| Parsed Value | RSS v2.0       | Atom v1.0 |
+| ------------ | -------------- | --------- |
+| title        | title          | title     |
+| links        | link           | link      |
+| description  | description    | subtitle  |
+| language     | language       |           |
+| copyright    | copyright      | rights    |
+| authors      | managingEditor | author    |
+| published    | pubDate        | published |
+| updated      | lastBuildDate  | updated   |
+| categories   | category       | category  |
+| image        | image          | logo      |
+| items        | item           | entry     |
 
 ### Item / Entry Level elements
 
-| Parsed Value  | RSS v2.0             | Atom v1.0     |
-| ------------- | ---------------      | ------------- |
-| id            | guid                 | id            |
-| title         | title                | title         |
-| imageUrl      |                      | icon          |
-| links         | link                 | link          |
-| description   | description          | summary       |
-| content       | content:encoded      | content       |
-| categories    | category / dc:subject| category      |
-| authors       | author / dc:creator  | contributor   |
-| published     | pubDate / dc:date    | published     |
-| enclosures    | enclosures           | link          |
+| Parsed Value | RSS v2.0              | Atom v1.0   |
+| ------------ | --------------------- | ----------- |
+| id           | guid                  | id          |
+| title        | title                 | title       |
+| imageUrl     |                       | icon        |
+| links        | link                  | link        |
+| description  | description           | summary     |
+| content      | content:encoded       | content     |
+| categories   | category / dc:subject | category    |
+| authors      | author / dc:creator   | contributor |
+| published    | pubDate / dc:date     | published   |
+| enclosures   | enclosures            | link        |
 
 ## Development setup
 
@@ -174,4 +192,4 @@ If you find any bugs or have a feature request, please create an issue in [GitHu
 
 ## License
 
-Distributed under the MIT license. See ``LICENSE`` for more information.
+Distributed under the MIT license. See `LICENSE` for more information.

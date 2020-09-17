@@ -1,22 +1,22 @@
-var utils = require('./utils');
-var model = require('../model/rss');
-var itunesParser = require('./itunes');
+var utils = require("./utils");
+var model = require("../model/rss");
+var itunesParser = require("./itunes");
 
-exports.parse = function(document) {
+exports.parse = function(document, customFields) {
   let parsedFeed = Object.assign({}, model.rss);
-  
+
   parsedFeed = mapChannelFields(document, parsedFeed);
-  parsedFeed.type = 'atom-v1';
-  parsedFeed.items = mapItems(document);
+  parsedFeed.type = "atom-v1";
+  parsedFeed.items = mapItems(document, customFields);
 
   return parsedFeed;
 };
 
 function mapChannelFields(document, parsedFeed) {
-  const channelNodes = utils.getElements(document, 'feed');
+  const channelNodes = utils.getElements(document, "feed");
 
   if (!channelNodes || channelNodes.length === 0) {
-    throw new Error('Could not find channel node');
+    throw new Error("Could not find channel node");
   }
 
   const channelNode = channelNodes[0];
@@ -36,65 +36,65 @@ function mapChannelFields(document, parsedFeed) {
 }
 
 function getChannelTitle(node) {
-  return utils.getElementTextContent(node, 'title');
+  return utils.getElementTextContent(node, "title");
 }
 
 function getChannelLinks(node) {
-  const links = utils.getChildElements(node, 'link');
+  const links = utils.getChildElements(node, "link");
 
   return links.map(function(link) {
     return {
-      url: link.getAttribute('href'),
-      rel: link.getAttribute('rel')
+      url: link.getAttribute("href"),
+      rel: link.getAttribute("rel")
     };
   });
 }
 
 function getChannelDescription(node) {
-  return utils.getElementTextContent(node, 'subtitle');
+  return utils.getElementTextContent(node, "subtitle");
 }
 
 function getChannelCopyright(node) {
-  return utils.getElementTextContent(node, 'rights');
+  return utils.getElementTextContent(node, "rights");
 }
 
 function getChannelAuthors(node) {
-  const authors = utils.getChildElements(node, 'author');
+  const authors = utils.getChildElements(node, "author");
 
   return authors.map(function(author) {
     return {
-      name: utils.getElementTextContent(author, 'name')
+      name: utils.getElementTextContent(author, "name")
     };
   });
 }
 
 function getChannelLastUpdated(node) {
-  return utils.getElementTextContent(node, 'updated');
+  return utils.getElementTextContent(node, "updated");
 }
 
 function getChannelLastPublished(node) {
-  return utils.getElementTextContent(node, 'published');
+  return utils.getElementTextContent(node, "published");
 }
 
 function getChannelCategories(node) {
-  const categories = utils.getChildElements(node, 'category');
+  const categories = utils.getChildElements(node, "category");
 
   return categories.map(function(category) {
     return {
-      name: category.getAttribute('term')
-    }
+      name: category.getAttribute("term")
+    };
   });
 }
 
 function getChannelImage(node) {
-  var img = utils.getElementTextContent(node, 'image');
+  var img = utils.getElementTextContent(node, "image");
 
-  if(img === '' || img === undefined){
-    img = utils.getElementTextContent(node, 'logo');
+  if (img === "" || img === undefined) {
+    img = utils.getElementTextContent(node, "logo");
   }
 
-  if(img === '' || img === undefined){
-    img = utils.getElementTextContent(node, 'icon');
+  if (img === "" || img === undefined) {
+    img = utils.getElementTextContent(node, "icon");
   }
 
   return {
@@ -102,92 +102,94 @@ function getChannelImage(node) {
     title: undefined,
     description: undefined,
     width: undefined,
-    height: undefined,
+    height: undefined
   };
 }
 
 function getItemTitle(node) {
-  return utils.getElementTextContent(node, 'title');
+  return utils.getElementTextContent(node, "title");
 }
 
 function getItemLinks(node) {
-  const links = utils.getChildElements(node, 'link');
-  const linksWithoutEnclosures = links.filter(link =>
-    link.getAttribute('rel') !== 'enclosure');
+  const links = utils.getChildElements(node, "link");
+  const linksWithoutEnclosures = links.filter(
+    link => link.getAttribute("rel") !== "enclosure"
+  );
 
   return linksWithoutEnclosures.map(function(link) {
     return {
-      url: link.getAttribute('href'),
-      rel: link.getAttribute('rel')
+      url: link.getAttribute("href"),
+      rel: link.getAttribute("rel")
     };
   });
 }
 
 function getItemDescription(node) {
-  return utils.getElementTextContent(node, 'summary');
+  return utils.getElementTextContent(node, "summary");
 }
 
 function getItemContent(node) {
-  return utils.getElementTextContent(node, 'content');
+  return utils.getElementTextContent(node, "content");
 }
 
 function getItemImage(node) {
-  return utils.getElementTextContent(node, 'icon');
+  return utils.getElementTextContent(node, "icon");
 }
 
 function getItemAuthors(node) {
-  const authors = utils.getChildElements(node, 'author');
+  const authors = utils.getChildElements(node, "author");
 
   return authors.map(function(author) {
     return {
-      name: utils.getElementTextContent(author, 'name')
+      name: utils.getElementTextContent(author, "name")
     };
   });
 }
 
 function getItemCategories(node) {
-  const categories = utils.getChildElements(node, 'category');
+  const categories = utils.getChildElements(node, "category");
 
   return categories.map(function(category) {
     return {
-      name: category.getAttribute('term')
-    }
+      name: category.getAttribute("term")
+    };
   });
 }
 
 function getItemPublished(node) {
-  var pub = utils.getElementTextContent(node, 'updated');
+  var pub = utils.getElementTextContent(node, "updated");
 
-  if(pub === '' || pub === undefined){
-    utils.getElementTextContent(node, 'published');
+  if (pub === "" || pub === undefined) {
+    utils.getElementTextContent(node, "published");
   }
 
   return pub;
 }
 
 function getItemId(node) {
-  return utils.getElementTextContent(node, 'id');
+  return utils.getElementTextContent(node, "id");
 }
 
 function getItemEnclosures(node) {
-  const links = utils.getChildElements(node, 'link');
-  const enclosureLinks = links.filter(link =>
-    link.getAttribute('rel') === 'enclosure');
+  const links = utils.getChildElements(node, "link");
+  const enclosureLinks = links.filter(
+    link => link.getAttribute("rel") === "enclosure"
+  );
 
   return enclosureLinks.map(function(link) {
     return {
-      url: link.getAttribute('href'),
-      length: link.getAttribute('length'),
-      mimeType: link.getAttribute('type')
+      url: link.getAttribute("href"),
+      length: link.getAttribute("length"),
+      mimeType: link.getAttribute("type")
     };
   });
 }
 
-function mapItems(document) {
-  const itemNodes = utils.getElements(document, 'entry');
+function mapItems(document, customFields) {
+  const itemNodes = utils.getElements(document, "entry");
 
   return itemNodes.map(function(item) {
-    return {
+    items = {
       title: getItemTitle(item),
       links: getItemLinks(item),
       description: getItemDescription(item),
@@ -200,5 +202,9 @@ function mapItems(document) {
       enclosures: getItemEnclosures(item),
       itunes: itunesParser.parseItem(item)
     };
+    for (const field of customFields) {
+      items[field] = utils.getElementTextContent(item, field);
+    }
+    return items;
   });
 }

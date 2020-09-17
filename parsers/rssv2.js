@@ -1,23 +1,23 @@
-var utils = require('./utils');
-var model = require('../model/rss');
-var namespaces = require('./namespaces');
-var itunesParser = require('./itunes');
+var utils = require("./utils");
+var model = require("../model/rss");
+var namespaces = require("./namespaces");
+var itunesParser = require("./itunes");
 
-exports.parse = function(document) {
+exports.parse = function(document, customFields) {
   let parsedFeed = Object.assign({}, model.rss);
 
   parsedFeed = mapChannelFields(document, parsedFeed);
-  parsedFeed.type = 'rss-v2';
-  parsedFeed.items = mapItems(document);
+  parsedFeed.type = "rss-v2";
+  parsedFeed.items = mapItems(document, customFields);
 
   return parsedFeed;
 };
 
 function mapChannelFields(document, parsedFeed) {
-  const channelNodes = utils.getElements(document, 'channel');
+  const channelNodes = utils.getElements(document, "channel");
 
   if (!channelNodes || channelNodes.length === 0) {
-    throw new Error('Could not find channel node');
+    throw new Error("Could not find channel node");
   }
 
   const channelNode = channelNodes[0];
@@ -38,34 +38,34 @@ function mapChannelFields(document, parsedFeed) {
 }
 
 function getChannelTitle(node) {
-  return utils.getElementTextContent(node, 'title');
+  return utils.getElementTextContent(node, "title");
 }
 
 function getChannelLinks(node) {
-  const links = utils.getChildElements(node, 'link');
+  const links = utils.getChildElements(node, "link");
 
   return links.map(function(link) {
     return {
       url: link.textContent,
-      rel: link.getAttribute('rel')
+      rel: link.getAttribute("rel")
     };
   });
 }
 
 function getChannelDescription(node) {
-  return utils.getElementTextContent(node, 'description');
+  return utils.getElementTextContent(node, "description");
 }
 
 function getChannelLanguage(node) {
-  return utils.getElementTextContent(node, 'language');
+  return utils.getElementTextContent(node, "language");
 }
 
 function getChannelCopyright(node) {
-  return utils.getElementTextContent(node, 'copyright');
+  return utils.getElementTextContent(node, "copyright");
 }
 
 function getChannelAuthors(node) {
-  const authors = utils.getElementTextContentArray(node, 'managingEditor');
+  const authors = utils.getElementTextContentArray(node, "managingEditor");
 
   return authors.map(function(author) {
     return {
@@ -75,25 +75,25 @@ function getChannelAuthors(node) {
 }
 
 function getChannelLastUpdated(node) {
-  return utils.getElementTextContent(node, 'lastBuildDate');
+  return utils.getElementTextContent(node, "lastBuildDate");
 }
 
 function getChannelLastPublished(node) {
-  return utils.getElementTextContent(node, 'pubDate');
+  return utils.getElementTextContent(node, "pubDate");
 }
 
 function getChannelCategories(node) {
-  const categories = utils.getElementTextContentArray(node, 'category');
+  const categories = utils.getElementTextContentArray(node, "category");
 
   return categories.map(function(category) {
     return {
       name: category
-    }
+    };
   });
 }
 
 function getChannelImage(node) {
-  const imageNodes = utils.getChildElements(node, 'image');
+  const imageNodes = utils.getChildElements(node, "image");
 
   if (imageNodes.length === 0) {
     return {
@@ -108,42 +108,42 @@ function getChannelImage(node) {
   const imageNode = imageNodes[0];
 
   return {
-    url: utils.getElementTextContent(imageNode, 'url'),
-    title: utils.getElementTextContent(imageNode, 'title'),
-    description: utils.getElementTextContent(imageNode, 'description'),
-    width: utils.getElementTextContent(imageNode, 'width'),
-    height: utils.getElementTextContent(imageNode, 'height'),
+    url: utils.getElementTextContent(imageNode, "url"),
+    title: utils.getElementTextContent(imageNode, "title"),
+    description: utils.getElementTextContent(imageNode, "description"),
+    width: utils.getElementTextContent(imageNode, "width"),
+    height: utils.getElementTextContent(imageNode, "height")
   };
 }
 
 function getItemTitle(node) {
-  return utils.getElementTextContent(node, 'title');
+  return utils.getElementTextContent(node, "title");
 }
 
 function getItemLinks(node) {
-  const links = utils.getChildElements(node, 'link');
+  const links = utils.getChildElements(node, "link");
 
   return links.map(function(link) {
     return {
       url: link.textContent,
-      rel: link.getAttribute('rel')
+      rel: link.getAttribute("rel")
     };
   });
 }
 
 function getItemDescription(node) {
-  return utils.getElementTextContent(node, 'description');
+  return utils.getElementTextContent(node, "description");
 }
 
 function getItemContent(node) {
-  return utils.getElementTextContent(node, 'encoded', namespaces.content);
+  return utils.getElementTextContent(node, "encoded", namespaces.content);
 }
 
 function getItemAuthors(node) {
-  let authors = utils.getElementTextContentArray(node, 'author');
+  let authors = utils.getElementTextContentArray(node, "author");
 
   if (authors.length === 0) {
-    authors = utils.getElementTextContentArray(node, 'dc:creator');
+    authors = utils.getElementTextContentArray(node, "dc:creator");
   }
 
   return authors.map(function(author) {
@@ -154,44 +154,46 @@ function getItemAuthors(node) {
 }
 
 function getItemCategories(node) {
-  let categories = utils.getElementTextContentArray(node, 'category');
+  let categories = utils.getElementTextContentArray(node, "category");
 
   if (categories.length === 0) {
-    categories = utils.getElementTextContentArray(node, 'dc:subject');
+    categories = utils.getElementTextContentArray(node, "dc:subject");
   }
 
   return categories.map(function(category) {
     return {
       name: category
-    }
+    };
   });
 }
 
 function getItemId(node) {
-  return utils.getElementTextContent(node, 'guid');
+  return utils.getElementTextContent(node, "guid");
 }
 
 function getItemPublished(node) {
-  return utils.getElementTextContent(node, 'pubDate') || utils.getElementTextContent(node, 'dc:date');
+  return (
+    utils.getElementTextContent(node, "pubDate") ||
+    utils.getElementTextContent(node, "dc:date")
+  );
 }
 
 function getItemEnclosures(node) {
-  const enclosures = utils.getChildElements(node, 'enclosure');
+  const enclosures = utils.getChildElements(node, "enclosure");
 
   return enclosures.map(function(enclosure) {
     return {
-      url: enclosure.getAttribute('url'),
-      length: enclosure.getAttribute('length'),
-      mimeType: enclosure.getAttribute('type')
-    }
+      url: enclosure.getAttribute("url"),
+      length: enclosure.getAttribute("length"),
+      mimeType: enclosure.getAttribute("type")
+    };
   });
 }
 
-function mapItems(document) {
-  const itemNodes = utils.getElements(document, 'item');
-
+function mapItems(document, customFields) {
+  const itemNodes = utils.getElements(document, "item");
   return itemNodes.map(function(item) {
-    return {
+    items = {
       title: getItemTitle(item),
       links: getItemLinks(item),
       description: getItemDescription(item),
@@ -203,5 +205,9 @@ function mapItems(document) {
       enclosures: getItemEnclosures(item),
       itunes: itunesParser.parseItem(item)
     };
+    for (const field of customFields) {
+      items[field] = utils.getElementTextContent(item, field);
+    }
+    return items;
   });
 }
