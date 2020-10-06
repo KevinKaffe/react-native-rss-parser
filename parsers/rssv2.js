@@ -126,7 +126,8 @@ function getItemLinks(node) {
   return links.map(function(link) {
     return {
       url: link.textContent,
-      rel: link.getAttribute("rel")
+      rel: link.getAttribute("rel"),
+      href: link.getAttribute("href")
     };
   });
 }
